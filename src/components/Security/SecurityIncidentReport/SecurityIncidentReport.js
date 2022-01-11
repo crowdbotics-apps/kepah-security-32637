@@ -15,15 +15,14 @@ import {
 import { RFValue } from "react-native-responsive-fontsize"
 import Header from "../Header/Header"
 const { height } = Dimensions.get("screen")
+import pathUrl from "../../../config/path"
 
 const SecurityReport = ({ navigation }) => {
   const [incidentId, setIncidentId] = useState(null)
   const [all, setAll] = useState(true)
   const [manage, setManage] = useState(false)
   const [police, setPolice] = useState(false)
-  const [previousIncidentList, setPreviousIncidentList] = useState([
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-  ])
+  const [previousIncidentList, setPreviousIncidentList] = useState([])
   useEffect(() => {
     getToken()
   }, [])
@@ -34,6 +33,7 @@ const SecurityReport = ({ navigation }) => {
       if (value !== null) {
         getSecurityList(value)
       }
+      console.log(value)
     } catch (error) {}
   }
 
@@ -41,9 +41,9 @@ const SecurityReport = ({ navigation }) => {
     console.log("==---===")
     var config = {
       method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/security-report/",
+      url: `${pathUrl}/api/v1/security-report?residence_building=3&incident_status=0,1&start_date=2021-05-20&end_date=2021-05-24`,
       headers: {
-        Authorization: `token ${token}`,
+        Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
         "Content-Type": "application/json"
       }
     }
@@ -239,12 +239,14 @@ const SecurityReport = ({ navigation }) => {
                         <Text
                           style={{ fontWeight: "bold", fontSize: RFValue(15) }}
                         >
-                          Incident Report Type#1
+                          {val.incident_type}
                         </Text>
                       </View>
                       <View>
                         <View>
-                          <Text style={{ fontSize: 11 }}>10.12.21 13:10</Text>
+                          <Text style={{ fontSize: 11 }}>
+                            {val.report_date} {val.report_time}
+                          </Text>
                         </View>
                       </View>
                     </TouchableOpacity>
@@ -274,7 +276,7 @@ const SecurityReport = ({ navigation }) => {
                                         textDecorationLine: "underline"
                                       }}
                                     >
-                                      #121212121
+                                      #{val.id}
                                     </Text>
                                   </View>
 
@@ -283,7 +285,7 @@ const SecurityReport = ({ navigation }) => {
                                       Date & Time:
                                     </Text>
                                     <Text style={{ fontSize: RFValue(12) }}>
-                                      04/05/22 12:55PM
+                                      {val.report_date} {val.report_time}
                                     </Text>
                                   </View>
                                   <Text
@@ -311,17 +313,22 @@ const SecurityReport = ({ navigation }) => {
                                   </View>
 
                                   <View style={styles.title}>
-                                    <Image
-                                      source={require("../../../assets/security-back.jpg")}
-                                      style={{
-                                        height: 100,
-                                        width: 60,
-                                        borderRadius: 8
-                                        // left: i === 0 ? 0 : 10,
-                                      }}
-                                    />
+                                    {val.security_report_media.map((v, i) => {
+                                      return (
+                                        <Image
+                                          key={i}
+                                          source={{ uri: v.media_file }}
+                                          style={{
+                                            height: 100,
+                                            width: 60,
+                                            borderRadius: 8,
+                                            left: i === 0 ? 0 : 10
+                                          }}
+                                        />
+                                      )
+                                    })}
 
-                                    <Image
+                                    {/* <Image
                                       source={require("../../../assets/security-back.jpg")}
                                       style={{
                                         height: 100,
@@ -349,7 +356,7 @@ const SecurityReport = ({ navigation }) => {
                                         borderRadius: 8,
                                         left: 30
                                       }}
-                                    />
+                                    /> */}
                                   </View>
                                 </View>
                               </View>
