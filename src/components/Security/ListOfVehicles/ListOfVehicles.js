@@ -20,12 +20,15 @@ const { height, width } = Dimensions.get("screen")
 
 const Confirm = ({ navigation }) => {
   const [token, setToken] = useState("")
-  const [vehicles, setVehicles] = useState([1, 2, 3, , 5, 7, 9, 5, 7, 9, 7])
+  const [vehicles, setVehicles] = useState([])
   const isFocused = useIsFocused()
+  const [search, setSearch] = useState("")
+  const [filtered, setFiltered] = useState([])
 
   useEffect(() => {
     if (isFocused) {
-      getToken()
+      // getToken()
+      getVehicles()
     }
   }, [isFocused])
 
@@ -35,6 +38,7 @@ const Confirm = ({ navigation }) => {
       if (value !== null) {
         setToken(value)
         getVehicles(value)
+        console.log(value)
       }
     } catch (error) {}
   }
@@ -42,9 +46,9 @@ const Confirm = ({ navigation }) => {
   const getVehicles = token => {
     let config = {
       method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/vehicle/",
+      url: "https://kepah-24275.botics.co/api/v1/illegal-parking/?residence_building=3",
       headers: {
-        Authorization: `token ${token}`,
+        Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
         "Content-Type": "application/json"
       }
     }
@@ -55,10 +59,25 @@ const Confirm = ({ navigation }) => {
         if (vehicles && vehicles.length > 0) {
           vehicles.reverse()
           setVehicles(vehicles)
+          setFiltered(vehicles)
+          console.log(response)
         }
       })
       .catch(error => {})
   }
+
+  useEffect(() => {
+    let filter = vehicles.filter(val => {
+      if (search !== "" && val.vehicle_number.includes(search)) {
+        return val
+      }
+    })
+    if (filter.length < 1 && search === "") {
+      setVehicles(vehicles)
+    } else {
+      setVehicles(filter)
+    }
+  }, [search])
 
   return (
     <KeyboardAvoidingView
@@ -97,19 +116,18 @@ const Confirm = ({ navigation }) => {
             <TextInput
               keyboardType="web-search"
               placeholder="Secrch by Name/Tag Number"
+              onChange={e => setSearch(e.target.value)}
             />
             <Image source={require("../../../assets/security-search.png")} />
           </View>
           {vehicles.map((val, ind) => {
             return (
-              <View>
+              <View key={ind}>
                 <View style={styles.vehicle_names_view}>
                   <View>
                     <View style={styles.vehicle_number_view}>
                       <Text style={styles.vehicle_serial_no}>{ind + 1}.</Text>
-                      <Text style={styles.vehicle_number}>
-                        BMW - 567345XYZ
-                      </Text>
+                      <Text style={styles.vehicle_number}>{val.vehicle_number}</Text>
                     </View>
                   </View>
                   <TouchableOpacity

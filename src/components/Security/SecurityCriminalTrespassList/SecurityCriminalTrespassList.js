@@ -25,7 +25,8 @@ const Confirm = ({ navigation }) => {
 
   useEffect(() => {
     if (isFocused) {
-      getToken()
+      // getToken()
+      getVehicles()
     }
   }, [isFocused])
 
@@ -42,9 +43,9 @@ const Confirm = ({ navigation }) => {
   const getVehicles = token => {
     let config = {
       method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/vehicle/",
+      url: "https://kepah-24275.botics.co/api/v1/criminal-status?residence_building=",
       headers: {
-        Authorization: `token ${token}`,
+        Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
         "Content-Type": "application/json"
       }
     }

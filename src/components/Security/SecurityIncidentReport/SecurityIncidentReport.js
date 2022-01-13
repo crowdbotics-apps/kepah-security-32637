@@ -24,7 +24,8 @@ const SecurityReport = ({ navigation }) => {
   const [police, setPolice] = useState(false)
   const [previousIncidentList, setPreviousIncidentList] = useState([])
   useEffect(() => {
-    getToken()
+    // getToken()
+    getSecurityList()
   }, [])
 
   const getToken = async () => {
@@ -251,7 +252,7 @@ const SecurityReport = ({ navigation }) => {
                       </View>
                     </TouchableOpacity>
                     {incidentId === val ? (
-                      <View>
+                      <View style={{}}>
                         <View style={styles.incidentType_secondview} />
                         <View>
                           <View>
@@ -297,9 +298,7 @@ const SecurityReport = ({ navigation }) => {
                                       Incident Report Details:
                                     </Text>
                                     <Text style={{ fontSize: RFValue(12) }}>
-                                      Lorem ipsum dolor sit amet, consectetur
-                                      adipiscing elit. Aenean quis erat eget mi
-                                      imperdiet mattis. Quisque luctus.
+                                      {val.incident_summary}
                                     </Text>
                                   </Text>
 
@@ -308,7 +307,7 @@ const SecurityReport = ({ navigation }) => {
                                       Status:
                                     </Text>
                                     <Text style={{ fontSize: RFValue(12) }}>
-                                      Filed (By Police)
+                                      {val.incident_status}
                                     </Text>
                                   </View>
 
@@ -377,7 +376,7 @@ const SecurityReport = ({ navigation }) => {
           onPress={() => navigation.navigate("ReportSecurity")}
         >
           <View style={styles.btnView}>
-            <Text style={styles.btnText}>SUBMIT </Text>
+            <Text style={styles.btnText}>FILE AN INCIDNET REPORT </Text>
           </View>
         </TouchableOpacity>
       </ScrollView>
@@ -579,6 +578,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between"
+    // backgroundColor: "#E9F1FD",
+    // padding: 15,
+    // borderRadius: 10
   },
   type_view: {
     display: "flex",
