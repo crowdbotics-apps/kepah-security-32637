@@ -133,7 +133,7 @@ const Confirm = ({ navigation }) => {
                   <TouchableOpacity
                     onPress={() => navigation.navigate("VehicleOwnerProfile")}
                   >
-                    <Text style={styles.view_more}>View more</Text>
+                    {/* <Text style={styles.view_more}>View more</Text> */}
                   </TouchableOpacity>
                 </View>
 
