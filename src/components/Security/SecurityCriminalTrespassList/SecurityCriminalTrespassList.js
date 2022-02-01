@@ -20,13 +20,13 @@ const { height } = Dimensions.get("screen")
 
 const Confirm = ({ navigation }) => {
   const [token, setToken] = useState("")
-  const [vehicles, setVehicles] = useState([1, 2, 3, , 5, 7, 9, 5, 7, 9, 7])
+  const [criminalTrespass, setCriminalTrespass] = useState([1])
   const isFocused = useIsFocused()
 
   useEffect(() => {
     if (isFocused) {
       // getToken()
-      getVehicles()
+      getCriminalTrespass()
     }
   }, [isFocused])
 
@@ -35,15 +35,15 @@ const Confirm = ({ navigation }) => {
       const value = await AsyncStorage.getItem("token")
       if (value !== null) {
         setToken(value)
-        getVehicles(value)
+        getCriminalTrespass(value)
       }
     } catch (error) {}
   }
 
-  const getVehicles = token => {
+  const getCriminalTrespass = token => {
     let config = {
       method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/criminal-status?residence_building=",
+      url: "https://kepah-24275.botics.co/api/v1/criminal-status?residence_building=1",
       headers: {
         Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
         "Content-Type": "application/json"
@@ -52,10 +52,10 @@ const Confirm = ({ navigation }) => {
 
     axios(config)
       .then(response => {
-        let vehicles = response.data
-        if (vehicles && vehicles.length > 0) {
-          vehicles.reverse()
-          setVehicles(vehicles)
+        let criminalTrespass = response.data
+        if (criminalTrespass && criminalTrespass.length > 0) {
+          criminalTrespass.reverse()
+          setCriminalTrespass(criminalTrespass)
         }
       })
       .catch(error => {})
@@ -103,27 +103,27 @@ const Confirm = ({ navigation }) => {
             />
             <Image source={require("../../../assets/security-search.png")} />
           </View>
-          {vehicles.map((val, ind) => {
+          {criminalTrespass.map((val, ind) => {
             return (
               <View style={styles.msg_conversation_1} key={ind}>
                 <View style={styles.conversation_view}>
                   <View style={styles.user_conversation}>
                     <View>
-                      <Image
-                        source={require("../../../assets/profile.jpeg")}
-                        style={styles.user_profile_image}
-                      />
+                      {val.user_details && val.user_details.profile_picture !== null ? (
+                        <Image
+                          source={{ url: val.user_details.profile_picture }}
+                          style={styles.user_profile_image}
+                        />
+                      ) : (
+                        // <Text>ji</Text>
+                        <Text style={{ fontSize: RFValue(9), color: "red" }}>
+                          Not found
+                        </Text>
+                      )}
                     </View>
                     <View style={{ marginLeft: 20 }}>
-                      <Text style={styles.user_name}>Manager 1</Text>
-                      <Text
-                        style={{
-                          fontSize: RFValue(12),
-                          marginTop: 5,
-                          color: "#848484"
-                        }}
-                      >
-                        Added by: John Doe(Resident)
+                      <Text style={styles.user_name}>
+                        {val.user_details && val.user_details.name !== null ? val.user_details.name : '-'}
                       </Text>
                       <Text
                         style={{
@@ -132,8 +132,27 @@ const Confirm = ({ navigation }) => {
                           color: "#848484"
                         }}
                       >
-                        Added: 12/04/21 14:23PM
+                        Added by: {val.marked_by}
                       </Text>
+                      {val.user_details &&
+                      <Text
+                        style={{
+                          fontSize: RFValue(12),
+                          marginTop: 5,
+                          color: "#848484"
+                        }}
+                      >
+                        Added:
+                        
+                        {new Date(val.user_details.date_joined).getDate()}/
+                        {new Date(val.user_details.date_joined).getMonth()}/
+                        {new Date(val.user_details.date_joined).getFullYear()}
+                        <Text style={{ marginLeft: 40 }}>
+                          {new Date(val.user_details.date_joined).getHours()}/
+                          {new Date(val.user_details.date_joined).getMinutes()}
+                        </Text>
+                      </Text>
+          }
                     </View>
                   </View>
                 </View>
@@ -213,11 +232,11 @@ const styles = StyleSheet.create({
   },
 
   bottomButton: {
-    marginTop: 20,
-    marginBottom: 20,
+    // marginTop: 20,
+    // // marginBottom: 20,
     width: "95%",
     alignSelf: "center",
-    position: "absolute",
+    // position: "absolute",
     bottom: 20
   },
   btnView: {

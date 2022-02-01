@@ -43,7 +43,7 @@ const Confirm = ({ navigation }) => {
   const getRentRoll = token => {
     let config = {
       method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/resident?residence_building=3",
+      url: "https://kepah-24275.botics.co/api/v1/resident?residence_building=1",
       headers: {
         Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
         "Content-Type": "application/json"
@@ -84,8 +84,8 @@ const Confirm = ({ navigation }) => {
               display: "flex",
               flexDirection: "row",
               justifyContent: "space-between",
-              paddingLeft: 10,
-              paddingRight: 10,
+              paddingLeft: 0,
+              paddingRight: 0,
               alignItems: "center"
             }}
           >
@@ -96,8 +96,9 @@ const Confirm = ({ navigation }) => {
                 borderWidth: 1,
                 borderColor: "#aeaeae",
                 height: 40,
-                width: 150,
-                borderRadius: 5
+                width: 130,
+                borderRadius: 5,
+                fontSize: RFValue(12)
               }}
             />
             <TextInput
@@ -107,8 +108,9 @@ const Confirm = ({ navigation }) => {
                 borderWidth: 1,
                 borderColor: "#aeaeae",
                 height: 40,
-                width: 150,
-                borderRadius: 5
+                width: 130,
+                borderRadius: 5,
+                fontSize: RFValue(12)
               }}
             />
             <View
@@ -145,13 +147,13 @@ const Confirm = ({ navigation }) => {
                 <View style={styles.vehicle_names_view}>
                   <View>
                     <View style={styles.vehicle_number_view}>
-                      <Text style={styles.vehicle_number}>Braylon Hensley</Text>
+                      <Text style={styles.vehicle_number}>{val.name !== null ? val.name : '-'}</Text>
                     </View>
                   </View>
                   <TouchableOpacity
                     onPress={() => navigation.navigate("VehicleOwnerProfile")}
                   >
-                    <Text style={styles.view_more}>70</Text>
+                    <Text style={styles.view_more}>{val.apt_number !== null ?val.apt_number: "-"}</Text>
                   </TouchableOpacity>
                 </View>
 

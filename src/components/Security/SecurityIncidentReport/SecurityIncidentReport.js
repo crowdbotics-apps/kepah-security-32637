@@ -42,7 +42,7 @@ const SecurityReport = ({ navigation }) => {
     console.log("==---===")
     var config = {
       method: "get",
-      url: `${pathUrl}/api/v1/security-report?residence_building=3&incident_status=0,1&start_date=2021-05-20&end_date=2021-05-24`,
+      url: `${pathUrl}/api/v1/security-report?residence_building=1&incident_status=0,1&start_date=2021-05-20&end_date=2021-05-24`,
       headers: {
         Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
         "Content-Type": "application/json"

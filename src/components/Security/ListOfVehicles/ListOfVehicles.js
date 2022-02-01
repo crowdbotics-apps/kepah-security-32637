@@ -46,7 +46,7 @@ const Confirm = ({ navigation }) => {
   const getVehicles = token => {
     let config = {
       method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/illegal-parking/?residence_building=3",
+      url: "https://kepah-24275.botics.co/api/v1/illegal-parking/?residence_building=1",
       headers: {
         Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
         "Content-Type": "application/json"
@@ -127,7 +127,9 @@ const Confirm = ({ navigation }) => {
                   <View>
                     <View style={styles.vehicle_number_view}>
                       <Text style={styles.vehicle_serial_no}>{ind + 1}.</Text>
-                      <Text style={styles.vehicle_number}>{val.vehicle_number}</Text>
+                      <Text style={styles.vehicle_number}>
+                        {val.vehicle_number !== null ? val.vehicle_number : "_"}
+                      </Text>
                     </View>
                   </View>
                   <TouchableOpacity
