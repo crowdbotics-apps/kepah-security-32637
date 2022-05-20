@@ -14,8 +14,8 @@ import {
 } from "react-native"
 import { RFValue } from "react-native-responsive-fontsize"
 import Header from "../Header/Header"
-const { height } = Dimensions.get("screen")
 import pathUrl from "../../../config/path"
+const { height } = Dimensions.get("screen")
 
 const SecurityReport = ({ navigation }) => {
   const [incidentId, setIncidentId] = useState(null)
@@ -25,26 +25,25 @@ const SecurityReport = ({ navigation }) => {
   const [previousIncidentList, setPreviousIncidentList] = useState([])
   useEffect(() => {
     // getToken()
-    getSecurityList()
+    getToken()
   }, [])
 
   const getToken = async () => {
     try {
       const value = await AsyncStorage.getItem("token")
+      console.log("--", value)
       if (value !== null) {
         getSecurityList(value)
       }
-      console.log(value)
     } catch (error) {}
   }
 
   const getSecurityList = token => {
-    console.log("==---===")
     var config = {
       method: "get",
-      url: `${pathUrl}/api/v1/security-report?residence_building=1&incident_status=0,1&start_date=2021-05-20&end_date=2021-05-24`,
+      url: `${pathUrl}/api/v1/security-report/?residence_building=1&incident_status=0`,
       headers: {
-        Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
+        Authorization: `token ${token}`,
         "Content-Type": "application/json"
       }
     }
@@ -55,7 +54,7 @@ const SecurityReport = ({ navigation }) => {
         setPreviousIncidentList(response.data)
       })
       .catch(error => {
-        console.log(error)
+        console.log("Here is error", error)
       })
   }
 

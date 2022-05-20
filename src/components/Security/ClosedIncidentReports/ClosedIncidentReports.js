@@ -14,14 +14,16 @@ import {
 } from "react-native"
 import { RFValue } from "react-native-responsive-fontsize"
 import Header from "../Header/Header"
+import pathUrl from "../../../config/path"
+
 const { height } = Dimensions.get("screen")
 
 const ClosedIncidentReports = ({ navigation }) => {
   const [incidentId, setIncidentId] = useState(null)
   const [closeIncidentList, setCloseIncidentList] = useState([])
   useEffect(() => {
-    // getToken()
-    getCloseIncidentList()
+    getToken()
+    // getCloseIncidentList()
   }, [])
 
   const getToken = async () => {
@@ -30,16 +32,17 @@ const ClosedIncidentReports = ({ navigation }) => {
       if (value !== null) {
         getCloseIncidentList(value)
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("-", error)
+    }
   }
 
   const getCloseIncidentList = token => {
-    console.log("==---===")
     var config = {
       method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/security-report?residence_building=1&incident_status=0,1&start_date=2021-05-20&end_date=2021-05-24",
+      url: `${pathUrl}/api/v1/security-report/?residence_building=1&incident_status=1`,
       headers: {
-        Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
+        Authorization: `token ${token}`,
         "Content-Type": "application/json"
       }
     }
@@ -77,7 +80,7 @@ const ClosedIncidentReports = ({ navigation }) => {
             {closeIncidentList.map((val, ind) => {
               return (
                 <View key={ind}>
-                  {val.incident_status === 1 && (
+                  {val.incident_status === 0 && (
                     <View style={styles.accountTop} key={ind}>
                       <View
                         style={{

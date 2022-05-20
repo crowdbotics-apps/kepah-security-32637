@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Dimensions,
   Image,
@@ -6,16 +6,58 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  AsyncStorage
 } from "react-native"
 import { RFValue } from "react-native-responsive-fontsize"
 import Header from "../Header/Header"
+import axios from "axios"
 
 const { width, height } = Dimensions.get("screen")
 
-const ResidentPortal = ({ navigation }) => {
+const ResidentPortal = ({ navigation, route }) => {
   const [requestType, setRequestType] = useState("")
   const [pressed, setPressed] = useState(false)
+  const [vehicle_id] = useState(route.params.vehicle_id)
+  const [status, setStatus] = useState(null)
+  const [token, setToken] = useState(null)
+
+  const updateParkingViolation = () => {
+    let data = JSON.stringify({
+      status: status
+    })
+
+    let config = {
+      method: "patch",
+      url: `https://kepah-24275.botics.co/api/v1/illegal-parking/${vehicle_id}/`,
+      headers: {
+        Authorization: `token ${token}`,
+        "Content-Type": "application/json"
+      },
+      data: data
+    }
+
+    axios(config)
+      .then(response => {
+        console.log(response)
+        navigation.navigate("ListOfVehicles")
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
+  const getFromAsyncStorage = async () => {
+    try {
+      let token = await AsyncStorage.getItem("token")
+      if (token) {
+        setToken(token)
+      }
+    } catch (error) {}
+  }
+  useEffect(() => {
+    getFromAsyncStorage()
+  }, [])
 
   return (
     <View>
@@ -109,6 +151,7 @@ const ResidentPortal = ({ navigation }) => {
                               onPress={() => {
                                 setPressed(false)
                                 setRequestType("Booted")
+                                setStatus(1)
                               }}
                               style={{ width: "100%" }}
                             >
@@ -125,11 +168,31 @@ const ResidentPortal = ({ navigation }) => {
                               onPress={() => {
                                 setPressed(false)
                                 setRequestType("Towed/Tow Warning Issued")
+                                setStatus(2)
+                              }}
+                              style={{ width: "100%" }}
+                            >
+                              <Text style={{ marginTop: 10 }}>Towed</Text>
+                            </TouchableOpacity>
+
+                            <View
+                              style={{
+                                borderWidth: 1,
+                                borderColor: "#fff",
+                                marginTop: 10
+                              }}
+                            />
+
+                            <TouchableOpacity
+                              onPress={() => {
+                                setPressed(false)
+                                setRequestType("No action taken")
+                                setStatus(null)
                               }}
                               style={{ width: "100%" }}
                             >
                               <Text style={{ marginTop: 10 }}>
-                                Towed/Tow Warning Issued
+                                No action taken
                               </Text>
                             </TouchableOpacity>
 
@@ -140,51 +203,6 @@ const ResidentPortal = ({ navigation }) => {
                                 marginTop: 10
                               }}
                             />
-                            <TouchableOpacity
-                              onPress={() => {
-                                setPressed(false)
-                                setRequestType("Demaged")
-                              }}
-                              style={{ width: "100%" }}
-                            >
-                              <Text style={{ marginTop: 10 }}>Demaged</Text>
-                            </TouchableOpacity>
-
-                            <View
-                              style={{
-                                borderWidth: 1,
-                                borderColor: "#fff",
-                                marginTop: 10
-                              }}
-                            />
-                            <TouchableOpacity
-                              onPress={() => {
-                                setPressed(false)
-                                setRequestType("Flat Tire")
-                              }}
-                              style={{ width: "100%" }}
-                            >
-                              <Text style={{ marginTop: 10 }}>Flat Tire</Text>
-                            </TouchableOpacity>
-
-                            <View
-                              style={{
-                                borderWidth: 1,
-                                borderColor: "#fff",
-                                marginTop: 10
-                              }}
-                            />
-                            <TouchableOpacity
-                              onPress={() => {
-                                setPressed(false)
-                                setRequestType("Remove Your Car")
-                              }}
-                              style={{ width: "100%" }}
-                            >
-                              <Text style={{ marginTop: 10 }}>
-                                Remove Your Car
-                              </Text>
-                            </TouchableOpacity>
                           </View>
                         </View>
                       </View>
@@ -196,21 +214,10 @@ const ResidentPortal = ({ navigation }) => {
               <View>
                 <TouchableOpacity
                   style={styles.informBtn}
-                  onPress={() => navigation.navigate("ResidentPortal")}
+                  onPress={updateParkingViolation}
                 >
                   <View style={styles.btnView2}>
-                    <Text style={styles.btnText2}>INFORM USER OF ACTION </Text>
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.bottomButton}
-                  onPress={() => navigation.navigate("ResidentPortal")}
-                >
-                  <View style={styles.btnView}>
-                    <Text style={styles.btnText}>
-                      PROCEED WITH VEHICLE ACTION{" "}
-                    </Text>
+                    <Text style={styles.btnText2}>CONFIRM</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -230,7 +237,7 @@ const styles = StyleSheet.create({
   },
   screen_name: { backgroundColor: "#e5e5e5", height: height / 3 },
 
-  inputViewMain: { top: 10 },
+  inputViewMain: { top: 10, zIndex: 1000 },
   createPass: { fontSize: RFValue(12), color: "#131313" },
   inputView: {
     display: "flex",
@@ -252,7 +259,13 @@ const styles = StyleSheet.create({
   },
 
   bottomButton: { paddingLeft: 15, paddingRight: 15, paddingBottom: 10 },
-  informBtn: { paddingLeft: 15, paddingRight: 15, paddingBottom: 10 },
+  informBtn: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingBottom: 10,
+    marginTop: 20,
+    zIndex: -1000
+  },
   btnView: {
     backgroundColor: "#1a73e8",
     padding: 10,
@@ -265,17 +278,18 @@ const styles = StyleSheet.create({
   btnText: { color: "#fff", fontWeight: "bold" },
 
   btnView2: {
-    backgroundColor: "#fff",
+    backgroundColor: "#1a73e8",
     borderWidth: 1,
     borderColor: "#1a73e8",
     padding: 10,
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
-    borderRadius: 5
+    borderRadius: 5,
+    zIndex: -1000
   },
 
-  btnText2: { color: "#1a73e8", fontWeight: "bold" },
+  btnText2: { color: "white", fontWeight: "bold" },
   scroll_view: { height: height - 60 },
   visitor_portal_view: { backgroundColor: "#e5e5e5", height: height / 4 },
   portal_view: {
@@ -331,7 +345,7 @@ const styles = StyleSheet.create({
   visitor_view: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
     height: height / 2
   },
   user_info_view: {

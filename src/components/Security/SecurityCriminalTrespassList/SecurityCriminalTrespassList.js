@@ -19,38 +19,36 @@ import Header from "../Header/Header"
 const { height } = Dimensions.get("screen")
 
 const Confirm = ({ navigation }) => {
-  const [token, setToken] = useState("")
   const [criminalTrespass, setCriminalTrespass] = useState([1])
   const isFocused = useIsFocused()
 
   useEffect(() => {
     if (isFocused) {
-      // getToken()
-      getCriminalTrespass()
+      getToken()
     }
   }, [isFocused])
 
   const getToken = async () => {
     try {
       const value = await AsyncStorage.getItem("token")
+      const buildingno = await AsyncStorage.getItem("buildingno")
       if (value !== null) {
-        setToken(value)
-        getCriminalTrespass(value)
+        getCriminalTrespass(value, buildingno)
       }
     } catch (error) {}
   }
 
-  const getCriminalTrespass = token => {
-    let config = {
-      method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/criminal-status?residence_building=1",
-      headers: {
-        Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
-        "Content-Type": "application/json"
-      }
-    }
-
-    axios(config)
+  const getCriminalTrespass = (token, buildingno) => {
+    axios
+      .get(
+        `https://kepah-24275.botics.co/api/v1/criminal-status/?residence_building=${buildingno}`,
+        {
+          headers: {
+            Authorization: `token ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      )
       .then(response => {
         let criminalTrespass = response.data
         if (criminalTrespass && criminalTrespass.length > 0) {
@@ -58,8 +56,31 @@ const Confirm = ({ navigation }) => {
           setCriminalTrespass(criminalTrespass)
         }
       })
-      .catch(error => {})
+      .catch(error => {
+        console.log("-", error)
+      })
   }
+
+  // const getCriminalTrespass = token => {
+  //   let config = {
+  //     method: "get",
+  //     url: "https://kepah-24275.botics.co/api/v1/criminal-status?residence_building=1",
+  //     headers: {
+  //       Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
+  //       "Content-Type": "application/json"
+  //     }
+  //   }
+
+  //   axios(config)
+  //     .then(response => {
+  // let criminalTrespass = response.data
+  // if (criminalTrespass && criminalTrespass.length > 0) {
+  //   criminalTrespass.reverse()
+  //   setCriminalTrespass(criminalTrespass)
+  // }
+  //     })
+  //     .catch(error => {})
+  // }
 
   return (
     <KeyboardAvoidingView
@@ -78,7 +99,7 @@ const Confirm = ({ navigation }) => {
             </Text>
 
             <Text style={styles.my_vehicle}>
-              Criminal Trespass List (36 Active)
+              Criminal Trespass List ({criminalTrespass.length})
             </Text>
           </View>
         </View>
@@ -109,21 +130,22 @@ const Confirm = ({ navigation }) => {
                 <View style={styles.conversation_view}>
                   <View style={styles.user_conversation}>
                     <View>
-                      {val.user_details && val.user_details.profile_picture !== null ? (
-                        <Image
-                          source={{ url: val.user_details.profile_picture }}
-                          style={styles.user_profile_image}
-                        />
-                      ) : (
-                        // <Text>ji</Text>
-                        <Text style={{ fontSize: RFValue(9), color: "red" }}>
-                          Not found
-                        </Text>
-                      )}
+                      <Image
+                        source={
+                          val.user_details && val.user_details.profile_picture
+                            ? {
+                                uri: val.user_details.profile_picture
+                              }
+                            : require("../../../assets/profile.jpeg")
+                        }
+                        style={styles.user_profile_image}
+                      />
                     </View>
                     <View style={{ marginLeft: 20 }}>
                       <Text style={styles.user_name}>
-                        {val.user_details && val.user_details.name !== null ? val.user_details.name : '-'}
+                        {val.user_details && val.user_details.name !== null
+                          ? val.user_details.name
+                          : "-"}
                       </Text>
                       <Text
                         style={{
@@ -134,25 +156,26 @@ const Confirm = ({ navigation }) => {
                       >
                         Added by: {val.marked_by}
                       </Text>
-                      {val.user_details &&
-                      <Text
-                        style={{
-                          fontSize: RFValue(12),
-                          marginTop: 5,
-                          color: "#848484"
-                        }}
-                      >
-                        Added:
-                        
-                        {new Date(val.user_details.date_joined).getDate()}/
-                        {new Date(val.user_details.date_joined).getMonth()}/
-                        {new Date(val.user_details.date_joined).getFullYear()}
-                        <Text style={{ marginLeft: 40 }}>
-                          {new Date(val.user_details.date_joined).getHours()}/
-                          {new Date(val.user_details.date_joined).getMinutes()}
+                      {val.user_details && (
+                        <Text
+                          style={{
+                            fontSize: RFValue(12),
+                            marginTop: 5,
+                            color: "#848484"
+                          }}
+                        >
+                          Added:
+                          {new Date(val.user_details.date_joined).getDate()}/
+                          {new Date(val.user_details.date_joined).getMonth()}/
+                          {new Date(val.user_details.date_joined).getFullYear()}
+                          <Text style={{ marginLeft: 40 }}>
+                            {new Date(val.user_details.date_joined).getHours()}/
+                            {new Date(
+                              val.user_details.date_joined
+                            ).getMinutes()}
+                          </Text>
                         </Text>
-                      </Text>
-          }
+                      )}
                     </View>
                   </View>
                 </View>

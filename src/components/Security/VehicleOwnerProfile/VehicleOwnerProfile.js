@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import {
   Dimensions,
   Image,
@@ -13,7 +13,8 @@ import Header from "../Header/Header"
 
 const { width, height } = Dimensions.get("screen")
 
-const ResidentPortal = ({ navigation }) => {
+const ResidentPortal = ({ navigation, route }) => {
+  const [vehicleInformation] = useState(route.params.vehicle)
   return (
     <View>
       <View style={{ backgroundColor: "#e5e5e5" }}>
@@ -29,7 +30,7 @@ const ResidentPortal = ({ navigation }) => {
             />
 
             <Text style={{ fontSize: RFValue(18), marginTop: 30 }}>
-              Jeep - 235DDC123
+              {vehicleInformation.vehicle_number}
             </Text>
           </View>
         </View>
@@ -38,7 +39,14 @@ const ResidentPortal = ({ navigation }) => {
             <View style={styles.user_profile_photo}>
               <View style={styles.user_photo_view}>
                 <Image
-                  source={require("../../../assets/profile.jpeg")}
+                  source={
+                    vehicleInformation.reporter_details.profile_picture
+                      ? {
+                          uri: vehicleInformation.reporter_details
+                            .profile_picture
+                        }
+                      : require("../../../assets/profile.jpeg")
+                  }
                   style={styles.profile_image}
                 />
               </View>
@@ -46,8 +54,12 @@ const ResidentPortal = ({ navigation }) => {
             <View style={styles.visitor_view}>
               <View style={styles.inputViewMain}>
                 <View style={styles.user_info_view}>
-                  <Text style={styles.john_doe_visitor}>Rodney Jones</Text>
-                  <Text style={{ fontSize: RFValue(13) }}>Resident</Text>
+                  <Text style={styles.john_doe_visitor}>
+                    {vehicleInformation.reporter_details.name}
+                  </Text>
+                  <Text style={{ fontSize: RFValue(13) }}>
+                    {vehicleInformation.reporter_details.user_type}
+                  </Text>
                   <Text
                     style={{
                       fontSize: RFValue(12),
@@ -72,11 +84,15 @@ const ResidentPortal = ({ navigation }) => {
 
                 <TouchableOpacity
                   style={styles.bottomButton}
-                  onPress={() => navigation.navigate("Dashboard")}
+                  onPress={() =>
+                    navigation.navigate("VehicleAction", {
+                      vehicle_id: vehicleInformation.id
+                    })
+                  }
                 >
                   <View style={styles.btnView}>
                     <Text style={styles.btnText}>
-                      PROCEED WITH VEHICLE ACTION{" "}
+                      PROCEED WITH VEHICLE ACTION
                     </Text>
                   </View>
                 </TouchableOpacity>
