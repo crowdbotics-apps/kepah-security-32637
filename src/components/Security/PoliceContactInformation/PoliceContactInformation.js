@@ -6,7 +6,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image
+  Image,
+  AsyncStorage
 } from "react-native"
 import { RFValue } from "react-native-responsive-fontsize"
 import Header from "../Header/Header"
@@ -19,7 +20,7 @@ const PoliceContactInformation = ({ navigation }) => {
   const getPoliceLiasionInformation = (token, buildingNo) => {
     var config = {
       method: "get",
-      url: `https://kepah-24275.botics.co/api/v1/police-liaison?residence_building=${buildingNo}`,
+      url: `https://kepah-24275.botics.co/api/v1/police-liaison/?residence_building=${buildingNo}`,
       headers: {
         Authorization: `token ${token}`,
         "Content-Type": "application/json"
@@ -28,17 +29,11 @@ const PoliceContactInformation = ({ navigation }) => {
 
     axios(config)
       .then(function (response) {
-        console.log(
-          "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=response.data.slice(response.data.length, 1)",
-          response.data.slice(response.data.length, 1)
-        )
         setPoliceLiasionInformation(
-          response.data.slice(response.data.length, 1)
+          response.data.slice(response.data.length - 1, response.data.length)
         )
       })
-      .catch(function (error) {
-        console.log(error)
-      })
+      .catch(function () {})
   }
 
   const getToken = async () => {
@@ -115,7 +110,8 @@ const PoliceContactInformation = ({ navigation }) => {
                           textDecorationLine: "underline"
                         }}
                       >
-                        AskUSCP@uscp.gov
+                        {policeLiasionInformation &&
+                          policeLiasionInformation[0].email}
                       </Text>
                     </View>
                     <View
@@ -135,7 +131,8 @@ const PoliceContactInformation = ({ navigation }) => {
                           fontSize: RFValue(13)
                         }}
                       >
-                        911
+                        {policeLiasionInformation &&
+                          policeLiasionInformation[0].phone_number}
                       </Text>
                     </View>
                   </View>
