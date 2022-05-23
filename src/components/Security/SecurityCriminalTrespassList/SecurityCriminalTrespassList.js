@@ -19,7 +19,9 @@ import Header from "../Header/Header"
 const { height } = Dimensions.get("screen")
 
 const Confirm = ({ navigation }) => {
-  const [criminalTrespass, setCriminalTrespass] = useState([1])
+  const [criminalTrespass, setCriminalTrespass] = useState([])
+  const [filtered, setFiltered] = useState([])
+  const [search, setSearch] = useState("")
   const isFocused = useIsFocused()
 
   useEffect(() => {
@@ -54,33 +56,35 @@ const Confirm = ({ navigation }) => {
         if (criminalTrespass && criminalTrespass.length > 0) {
           criminalTrespass.reverse()
           setCriminalTrespass(criminalTrespass)
+          setFiltered(criminalTrespass)
         }
       })
-      .catch(error => {
-        console.log("-", error)
-      })
+      .catch(() => {})
   }
 
-  // const getCriminalTrespass = token => {
-  //   let config = {
-  //     method: "get",
-  //     url: "https://kepah-24275.botics.co/api/v1/criminal-status?residence_building=1",
-  //     headers: {
-  //       Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
-  //       "Content-Type": "application/json"
-  //     }
-  //   }
-
-  //   axios(config)
-  //     .then(response => {
-  // let criminalTrespass = response.data
-  // if (criminalTrespass && criminalTrespass.length > 0) {
-  //   criminalTrespass.reverse()
-  //   setCriminalTrespass(criminalTrespass)
-  // }
-  //     })
-  //     .catch(error => {})
-  // }
+  useEffect(() => {
+    let filter = criminalTrespass.filter(val => {
+      if (
+        (search !== "" &&
+          val.user_details &&
+          val.user_details.name &&
+          val.user_details.name.toLowerCase().includes(search.toLowerCase())) ||
+        (search !== "" &&
+          val.marked_by_details &&
+          val.marked_by_details.name &&
+          val.marked_by_details.name
+            .toLowerCase()
+            .includes(search.toLowerCase()))
+      ) {
+        return val
+      }
+    })
+    if (filter.length < 1 && search === "") {
+      setFiltered(criminalTrespass)
+    } else {
+      setFiltered(filter)
+    }
+  }, [search])
 
   return (
     <KeyboardAvoidingView
@@ -99,7 +103,7 @@ const Confirm = ({ navigation }) => {
             </Text>
 
             <Text style={styles.my_vehicle}>
-              Criminal Trespass List ({criminalTrespass.length})
+              Criminal Trespass List ({filtered.length})
             </Text>
           </View>
         </View>
@@ -119,12 +123,13 @@ const Confirm = ({ navigation }) => {
             }}
           >
             <TextInput
-              keyboardType="web-search"
+              keyboardType="default"
               placeholder="Secrch by Name..."
+              onChangeText={setSearch}
             />
             <Image source={require("../../../assets/security-search.png")} />
           </View>
-          {criminalTrespass.map((val, ind) => {
+          {filtered.map((val, ind) => {
             return (
               <View style={styles.msg_conversation_1} key={ind}>
                 <View style={styles.conversation_view}>
@@ -154,7 +159,7 @@ const Confirm = ({ navigation }) => {
                           color: "#848484"
                         }}
                       >
-                        Added by: {val.marked_by}
+                        Added by: {val.marked_by_details.name}
                       </Text>
                       {val.user_details && (
                         <Text
@@ -169,7 +174,8 @@ const Confirm = ({ navigation }) => {
                           {new Date(val.user_details.date_joined).getMonth()}/
                           {new Date(val.user_details.date_joined).getFullYear()}
                           <Text style={{ marginLeft: 40 }}>
-                            {new Date(val.user_details.date_joined).getHours()}/
+                            -{new Date(val.user_details.date_joined).getHours()}
+                            :
                             {new Date(
                               val.user_details.date_joined
                             ).getMinutes()}
