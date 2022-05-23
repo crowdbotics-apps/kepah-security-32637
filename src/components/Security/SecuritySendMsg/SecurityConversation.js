@@ -19,35 +19,36 @@ const SubmitRequest = ({ navigation }) => {
   const [myId, setMyId] = useState("")
   const [selectedUserId] = useState("1")
   const [allMessages, setAllMessages] = useState([1])
-  const [limitToLast] = useState(9)
   const [loadingMessages, setLoadingMessages] = useState(false)
   const scrollViewRef = useRef()
 
   useEffect(() => {
-    getToken()
+    getMyId()
   }, [])
 
   useEffect(() => {
-    let _allMessages = []
-    firebase.default
-      .database()
-      .ref(`conversation/${myId}-${selectedUserId}`)
-      .on("child_added", val => {
-        let value = val.val()
-        value.id = val.key
-        _allMessages.push(value)
-        setAllMessages(_allMessages)
-        setLoadingMessages(false)
-      })
-  }, [myId, limitToLast])
+    if (myId) {
+      let _allMessages = []
+      firebase.default
+        .database()
+        .ref(`conversation/${myId}-${selectedUserId}`)
+        .on("child_added", val => {
+          let value = val.val()
+          value.id = val.key
+          _allMessages.push(value)
+          setAllMessages(_allMessages)
+          setLoadingMessages(false)
+        })
+    }
+  }, [myId])
 
   useEffect(() => {
     scrollViewRef.current.scrollToEnd({ animated: true })
   }, [myId])
 
-  const getToken = async () => {
+  const getMyId = async () => {
     try {
-      const value = await AsyncStorage.getItem("token")
+      const value = await AsyncStorage.getItem("user_id")
       if (value !== null) {
         setMyId(value)
       }
@@ -81,51 +82,14 @@ const SubmitRequest = ({ navigation }) => {
     var minutes = date.getMinutes()
     var ampm = hours >= 12 ? "pm" : "am"
     hours = hours % 12
-    hours = hours ? hours : 12 // the hour '0' should be '12'
+    hours = hours ? hours : 12
     minutes = minutes < 10 ? "0" + minutes : minutes
     var strTime = hours + ":" + minutes + " " + ampm
     return strTime
   })
 
-  const ifCloseToTop = ({ layoutMeasurement, contentOffset, contentSize }) => {
+  const ifCloseToTop = ({ contentOffset }) => {
     return contentOffset.y == 0
-  }
-
-  const renderItem = ({ item }) => {
-    return (
-     
-      <View style={item.userId !== myId ? styles.viewlft : styles.viewright}>
-        <View>
-          <Image
-            source={require("../../../assets/profile.jpeg")}
-            style={styles.profile}
-          />
-        </View>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            left: 20
-          }}
-        >
-          <View style={item.userId !== myId ? styles.msgleft : styles.msgrgt}>
-            <Text>{item.message}</Text>
-            <View style={{ position: "absolute", left: -15, top: 30 }}>
-              <Image
-                source={require("../../../assets/curve-2.png")}
-                style={item.userId !== myId ? styles.curvelft : styles.curvergt}
-              />
-            </View>
-          </View>
-
-          <View style={item.userId !== myId ? styles.timelft : styles.timergt}>
-            <Text style={{ fontSize: RFValue(12), color: "#2e1070" }}>
-              {formatAMPM(new Date(item.time))}
-            </Text>
-          </View>
-        </View>
-      </View>
-    )
   }
 
   return (
@@ -143,18 +107,6 @@ const SubmitRequest = ({ navigation }) => {
         >
           <View style={{ marginBottom: 100 }}>
             {loadingMessages ? <ActivityIndicator color="#2E1070" /> : null}
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Text style={{ fontSize: RFValue(12) }}>
-                Manager/Resident Log
-              </Text>
-            </View>
 
             {allMessages.map((val, ind) => {
               return (
@@ -242,7 +194,6 @@ const SubmitRequest = ({ navigation }) => {
                 </View>
               )
             })}
-
           </View>
         </ScrollView>
 

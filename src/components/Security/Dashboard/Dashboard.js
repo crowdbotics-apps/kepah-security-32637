@@ -19,16 +19,8 @@ const { width, height } = Dimensions.get("screen")
 const ResidentPortal = ({ navigation }) => {
   const [username, setUsername] = useState("")
   const [profile_picture, setProfilePic] = useState(null)
+  const [incidentList, setIncidentList] = useState([])
   const isFocused = useIsFocused()
-
-  const getToken = async () => {
-    try {
-      const value = await AsyncStorage.getItem("token")
-      if (value !== null) {
-        getUserDetails(value)
-      }
-    } catch (error) {}
-  }
 
   const getUserDetails = token => {
     axios
@@ -42,7 +34,38 @@ const ResidentPortal = ({ navigation }) => {
         setUsername(d.name)
         setProfilePic(d.profile_picture)
       })
-      .catch(error => {})
+      .catch(() => {})
+  }
+
+  const getSecurityList = (token, buildingNo) => {
+    var config = {
+      method: "get",
+      url: `${pathUrl}/api/v1/security-report/?residence_building=${buildingNo}&incident_status=0,1`,
+      headers: {
+        Authorization: `token ${token}`,
+        "Content-Type": "application/json"
+      }
+    }
+
+    axios(config)
+      .then(response => {
+        console.log(response.data)
+        setIncidentList(response.data)
+      })
+      .catch(error => {
+        console.log("Here is error", error)
+      })
+  }
+
+  const getToken = async () => {
+    try {
+      const value = await AsyncStorage.getItem("token")
+      const buildingno = await AsyncStorage.getItem("buildingno")
+      if (value !== null) {
+        getUserDetails(value)
+        getSecurityList(value, buildingno)
+      }
+    } catch (error) {}
   }
 
   useEffect(() => {
@@ -133,9 +156,13 @@ const ResidentPortal = ({ navigation }) => {
                 >
                   <Text style={styles.all_btns_texts}>INCIDENT</Text>
                   <Text style={styles.all_btns_texts}>REPORTS</Text>
-                  <View style={styles.quantity_violation}>
-                    <Text style={{ color: "#fff", fontWeight: "bold" }}>2</Text>
-                  </View>
+                  {incidentList.length > 0 && (
+                    <View style={styles.quantity_violation}>
+                      <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                        {incidentList.length}
+                      </Text>
+                    </View>
+                  )}
                 </TouchableOpacity>
 
                 <TouchableOpacity

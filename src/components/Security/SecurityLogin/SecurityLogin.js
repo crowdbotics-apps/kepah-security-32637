@@ -22,7 +22,6 @@ import pathUrl from "../../../config/path"
 const Welcome = ({ navigation }) => {
   const [username, setUsername] = React.useState("zubair_12")
   const [password, setPassword] = React.useState("zub123456")
-  const [response, setResponse] = React.useState()
 
   const [loggingIn, setLoggingIn] = React.useState(false)
 
@@ -38,20 +37,19 @@ const Welcome = ({ navigation }) => {
         password: password
       })
       .then(response => {
-        setResponse(response.data)
-
-        saveToken(response.data.token)
+        saveTokenandUid(response.data.token, response.data.user.id)
       })
       .catch(error => {
         setLoggingIn(false)
       })
   }
 
-  const saveToken = async token => {
+  const saveTokenandUid = async (token, id) => {
     setLoggingIn(false)
 
     try {
       await AsyncStorage.setItem("token", token)
+      await AsyncStorage.setItem("user_id", JSON.stringify(id))
       navigation.navigate("SelectProperty")
     } catch (error) {
       console.log("=-=", error)
