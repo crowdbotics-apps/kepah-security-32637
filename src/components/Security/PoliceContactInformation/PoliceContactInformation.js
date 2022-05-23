@@ -28,7 +28,6 @@ const PoliceContactInformation = ({ navigation }) => {
 
     axios(config)
       .then(function (response) {
-        alert()
         console.log(
           "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=response.data.slice(response.data.length, 1)",
           response.data.slice(response.data.length, 1)
