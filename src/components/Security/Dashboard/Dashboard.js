@@ -11,39 +11,20 @@ import {
   TouchableOpacity,
   View
 } from "react-native"
-import { launchImageLibrary } from "react-native-image-picker"
 import { RFValue } from "react-native-responsive-fontsize"
 import pathUrl from "../../../config/path"
 import Header from "../Header/Header"
-
 const { width, height } = Dimensions.get("screen")
 
 const ResidentPortal = ({ navigation }) => {
   const [username, setUsername] = useState("")
-
-  const [token, setToken] = useState("")
-
-  const [isModalVisible, setModalVisible] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [vehicle_number, setVehicleNumber] = useState("")
-  const [photo, setPhoto] = useState("")
-  const [image, setImage] = useState("")
-  const [residence_building, setResidentBuildingNo] = useState("")
   const [profile_picture, setProfilePic] = useState(null)
-
   const isFocused = useIsFocused()
-
-  useEffect(() => {
-    if (isFocused) {
-      getToken()
-    }
-  }, [isFocused])
 
   const getToken = async () => {
     try {
       const value = await AsyncStorage.getItem("token")
       if (value !== null) {
-        setToken(value)
         getUserDetails(value)
       }
     } catch (error) {}
@@ -59,58 +40,16 @@ const ResidentPortal = ({ navigation }) => {
       .then(response => {
         let d = response.data
         setUsername(d.name)
-        setResidentBuildingNo(d.residence_building)
         setProfilePic(d.profile_picture)
       })
       .catch(error => {})
   }
 
-  const uploadPhoto = () => {
-    launchImageLibrary(
-      {
-        mediaType: "photo"
-      },
-      response => {
-        setPhoto(response.uri)
-        setImage({
-          name: response.fileName,
-          uri:
-            Platform.OS === "android"
-              ? response.uri
-              : response.uri.replace("file://", ""),
-          type: response.type
-        })
-      }
-    )
-  }
-
-  const addParkingViolation = () => {
-    setLoading(true)
-    let data = new FormData()
-    data.append("vehicle_number", vehicle_number)
-    data.append("image", image)
-
-    let config = {
-      method: "post",
-      url: "https://kepah-24275.botics.co/api/v1/illegal-parking/",
-      headers: {
-        Authorization: `token ${token}`,
-        "Content-Type": "application/json"
-        // ...data.getHeaders(),
-      },
-      data: data
+  useEffect(() => {
+    if (isFocused) {
+      getToken()
     }
-    axios(config)
-      .then(s => {
-        setModalVisible(false)
-        setLoading(false)
-        setPhoto("")
-      })
-      .catch(error => {
-        setLoading(false)
-        setPhoto("")
-      })
-  }
+  }, [isFocused])
 
   return (
     <View style={styles.main}>
