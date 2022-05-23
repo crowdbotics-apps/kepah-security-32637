@@ -24,9 +24,7 @@ const Welcome = ({ navigation }) => {
     try {
       await AsyncStorage.setItem("buildingno", `${requestType}`)
       navigation.navigate("Dashboard")
-    } catch (e) {
-      console.log(e)
-    }
+    } catch (e) {}
   }
 
   return (
@@ -102,81 +100,13 @@ const Welcome = ({ navigation }) => {
                           >
                             <Text>Property Name #1</Text>
                           </TouchableOpacity>
-                          <View
+                          {/* <View
                             style={{
                               borderWidth: 1,
                               borderColor: "#fff",
                               marginTop: 10
                             }}
-                          />
-                          <TouchableOpacity
-                            onPress={() => {
-                              setPressed(false)
-                              setRequestType(3)
-                            }}
-                            style={{ width: "100%" }}
-                          >
-                            <Text style={{ marginTop: 10 }}>
-                              Property Name #2
-                            </Text>
-                          </TouchableOpacity>
-
-                          <View
-                            style={{
-                              borderWidth: 1,
-                              borderColor: "#fff",
-                              marginTop: 10
-                            }}
-                          />
-                          <TouchableOpacity
-                            onPress={() => {
-                              setPressed(false)
-                              setRequestType(3)
-                            }}
-                            style={{ width: "100%" }}
-                          >
-                            <Text style={{ marginTop: 10 }}>
-                              Property Name #3
-                            </Text>
-                          </TouchableOpacity>
-
-                          <View
-                            style={{
-                              borderWidth: 1,
-                              borderColor: "#fff",
-                              marginTop: 10
-                            }}
-                          />
-                          <TouchableOpacity
-                            onPress={() => {
-                              setPressed(false)
-                              setRequestType(4)
-                            }}
-                            style={{ width: "100%" }}
-                          >
-                            <Text style={{ marginTop: 10 }}>
-                              Property Name #4
-                            </Text>
-                          </TouchableOpacity>
-
-                          <View
-                            style={{
-                              borderWidth: 1,
-                              borderColor: "#fff",
-                              marginTop: 10
-                            }}
-                          />
-                          <TouchableOpacity
-                            onPress={() => {
-                              setPressed(false)
-                              setRequestType(5)
-                            }}
-                            style={{ width: "100%" }}
-                          >
-                            <Text style={{ marginTop: 10 }}>
-                              Property Name #5
-                            </Text>
-                          </TouchableOpacity>
+                          /> */}
                         </View>
                       </View>
                     </View>
