@@ -15,7 +15,6 @@ import {
 import { RFValue } from "react-native-responsive-fontsize"
 import Header from "../Header/Header"
 import pathUrl from "../../../config/path"
-
 const { height } = Dimensions.get("screen")
 
 const ClosedIncidentReports = ({ navigation }) => {
