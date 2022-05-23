@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     width: "95%",
     alignSelf: "center",
     // position: "absolute",
-    bottom: 20
+    bottom: 40
   },
   btnView: {
     backgroundColor: "#1a73e8",
