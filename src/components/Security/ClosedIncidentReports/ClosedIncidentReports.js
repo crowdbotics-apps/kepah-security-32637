@@ -14,34 +14,37 @@ import {
 } from "react-native"
 import { RFValue } from "react-native-responsive-fontsize"
 import Header from "../Header/Header"
+import pathUrl from "../../../config/path"
+
 const { height } = Dimensions.get("screen")
 
 const ClosedIncidentReports = ({ navigation }) => {
   const [incidentId, setIncidentId] = useState(null)
-  const [closeIncidentList, setCloseIncidentList] = useState([
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-  ])
+  const [closeIncidentList, setCloseIncidentList] = useState([])
   useEffect(() => {
-    // getToken()
-    getCloseIncidentList()
+    getToken()
+    // getCloseIncidentList()
   }, [])
 
   const getToken = async () => {
     try {
       const value = await AsyncStorage.getItem("token")
+      let buildingno = await AsyncStorage.getItem("buildingno")
+
       if (value !== null) {
-        getCloseIncidentList(value)
+        getCloseIncidentList(value, buildingno)
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("-", error)
+    }
   }
 
-  const getCloseIncidentList = token => {
-    console.log("==---===")
+  const getCloseIncidentList = (token, buildingNo) => {
     var config = {
       method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/security-report?residence_building=3&incident_status=0,1&start_date=2021-05-20&end_date=2021-05-24",
+      url: `${pathUrl}/api/v1/security-report/?residence_building=${buildingNo}&incident_status=1`,
       headers: {
-        Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
+        Authorization: `token ${token}`,
         "Content-Type": "application/json"
       }
     }
@@ -79,119 +82,116 @@ const ClosedIncidentReports = ({ navigation }) => {
             {closeIncidentList.map((val, ind) => {
               return (
                 <View key={ind}>
-                  {val.incident_status === 2 && (
-                    <View style={styles.accountTop} key={ind}>
-                      <View
-                        style={{
-                          backgroundColor: "#E9F1FD",
-                          padding: 15,
-                          borderRadius: 10
-                        }}
+                  <View style={styles.accountTop} key={ind}>
+                    <View
+                      style={{
+                        backgroundColor: "#E9F1FD",
+                        padding: 15,
+                        borderRadius: 10
+                      }}
+                    >
+                      <TouchableOpacity
+                        style={styles.list_view}
+                        onPress={() =>
+                          setIncidentId(incidentId === val ? null : val)
+                        }
                       >
-                        <TouchableOpacity
-                          style={styles.list_view}
-                          onPress={() =>
-                            setIncidentId(incidentId === val ? null : val)
-                          }
-                        >
-                          <View style={styles.flex}>
-                            <Text
-                              style={{
-                                fontWeight: "bold",
-                                fontSize: RFValue(15)
-                              }}
-                            >
-                              {val.incident_type}
+                        <View style={styles.flex}>
+                          <Text
+                            style={{
+                              fontWeight: "bold",
+                              fontSize: RFValue(15)
+                            }}
+                          >
+                            {val.incident_type}
+                          </Text>
+                        </View>
+                        <View>
+                          <View>
+                            <Text style={{ fontSize: 11 }}>
+                              {val.report_date} {val.report_time}
                             </Text>
                           </View>
+                        </View>
+                      </TouchableOpacity>
+                      {incidentId === val ? (
+                        <View>
+                          <View style={styles.incidentType_secondview} />
                           <View>
                             <View>
-                              <Text style={{ fontSize: 11 }}>
-                                {val.report_date} {val.report_time}
-                              </Text>
-                            </View>
-                          </View>
-                        </TouchableOpacity>
-                        {incidentId === val ? (
-                          <View>
-                            <View style={styles.incidentType_secondview} />
-                            <View>
-                              <View>
-                                <View
-                                  onPress={() => {}}
-                                  style={{ width: "100%" }}
-                                >
+                              <View
+                                onPress={() => {}}
+                                style={{ width: "100%" }}
+                              >
+                                <View>
                                   <View>
-                                    <View>
-                                      <View
-                                        style={{
-                                          marginTop: 10,
-                                          display: "flex",
-                                          flexDirection: "row"
-                                        }}
-                                      >
-                                        <Text style={styles.title_text}>
-                                          Incident Report Number:
-                                        </Text>
-                                        <Text
-                                          style={{
-                                            marginLeft: 5,
-                                            fontSize: RFValue(12)
-                                          }}
-                                        >
-                                          #{val.id}
-                                        </Text>
-                                      </View>
-
-                                      <View style={styles.title}>
-                                        <Text style={styles.title_text}>
-                                          Date & Time:
-                                        </Text>
-                                        <Text style={{ fontSize: RFValue(12) }}>
-                                          {val.report_date} {val.report_time}
-                                        </Text>
-                                      </View>
+                                    <View
+                                      style={{
+                                        marginTop: 10,
+                                        display: "flex",
+                                        flexDirection: "row"
+                                      }}
+                                    >
+                                      <Text style={styles.title_text}>
+                                        Incident Report Number:
+                                      </Text>
                                       <Text
                                         style={{
-                                          marginTop: 10
+                                          marginLeft: 5,
+                                          fontSize: RFValue(12)
                                         }}
                                       >
-                                        <Text style={styles.title_text}>
-                                          Incident Report Details:
-                                        </Text>
-                                        <Text style={{ fontSize: RFValue(12) }}>
-                                          {val.incident_summary}
-                                        </Text>
+                                        #{val.id}
                                       </Text>
+                                    </View>
 
-                                      <View style={styles.title}>
-                                        <Text style={styles.title_text}>
-                                          Status:
-                                        </Text>
-                                        <Text style={{ fontSize: RFValue(12) }}>
-                                          {val.incident_status}
-                                        </Text>
-                                      </View>
+                                    <View style={styles.title}>
+                                      <Text style={styles.title_text}>
+                                        Date & Time:
+                                      </Text>
+                                      <Text style={{ fontSize: RFValue(12) }}>
+                                        {val.report_date} {val.report_time}
+                                      </Text>
+                                    </View>
+                                    <Text
+                                      style={{
+                                        marginTop: 10
+                                      }}
+                                    >
+                                      <Text style={styles.title_text}>
+                                        Incident Report Details:
+                                      </Text>
+                                      <Text style={{ fontSize: RFValue(12) }}>
+                                        {val.incident_summary}
+                                      </Text>
+                                    </Text>
 
-                                      <View style={styles.title}>
-                                        {val.security_report_media.map(
-                                          (v, i) => {
-                                            return (
-                                              <Image
-                                                key={i}
-                                                source={{ uri: v.media_file }}
-                                                style={{
-                                                  height: 100,
-                                                  width: 60,
-                                                  borderRadius: 8,
-                                                  left: i === 0 ? 0 : 10
-                                                }}
-                                              />
-                                            )
-                                          }
-                                        )}
+                                    <View style={styles.title}>
+                                      <Text style={styles.title_text}>
+                                        Status:
+                                      </Text>
+                                      <Text style={{ fontSize: RFValue(12) }}>
+                                        {val.incident_status}
+                                      </Text>
+                                    </View>
 
-                                        {/* <Image
+                                    <View style={styles.title}>
+                                      {val.security_report_media.map((v, i) => {
+                                        return (
+                                          <Image
+                                            key={i}
+                                            source={{ uri: v.media_file }}
+                                            style={{
+                                              height: 100,
+                                              width: 60,
+                                              borderRadius: 8,
+                                              left: i === 0 ? 0 : 10
+                                            }}
+                                          />
+                                        )
+                                      })}
+
+                                      {/* <Image
                                           source={require("../../../assets/security-back.jpg")}
                                           style={{
                                             height: 100,
@@ -230,18 +230,17 @@ const ClosedIncidentReports = ({ navigation }) => {
                                             left: 30
                                           }}
                                         /> */}
-                                      </View>
                                     </View>
                                   </View>
                                 </View>
                               </View>
                             </View>
                           </View>
-                        ) : null}
-                        <View style={styles.bottom_border} />
-                      </View>
+                        </View>
+                      ) : null}
+                      <View style={styles.bottom_border} />
                     </View>
-                  )}
+                  </View>
                 </View>
               )
             })}

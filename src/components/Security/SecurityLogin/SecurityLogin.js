@@ -53,7 +53,9 @@ const Welcome = ({ navigation }) => {
     try {
       await AsyncStorage.setItem("token", token)
       navigation.navigate("SelectProperty")
-    } catch (error) {}
+    } catch (error) {
+      console.log("=-=", error)
+    }
   }
 
   return (

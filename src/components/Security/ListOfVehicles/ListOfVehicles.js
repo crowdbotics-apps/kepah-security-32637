@@ -19,7 +19,6 @@ import Header from "../Header/Header"
 const { height, width } = Dimensions.get("screen")
 
 const Confirm = ({ navigation }) => {
-  const [token, setToken] = useState("")
   const [vehicles, setVehicles] = useState([])
   const isFocused = useIsFocused()
   const [search, setSearch] = useState("")
@@ -27,28 +26,29 @@ const Confirm = ({ navigation }) => {
 
   useEffect(() => {
     if (isFocused) {
-      // getToken()
+      getFromAsyncStorage()
       getVehicles()
     }
   }, [isFocused])
 
-  const getToken = async () => {
+  const getFromAsyncStorage = async () => {
     try {
-      const value = await AsyncStorage.getItem("token")
-      if (value !== null) {
-        setToken(value)
-        getVehicles(value)
-        console.log(value)
+      let token = await AsyncStorage.getItem("token")
+      let buildingno = await AsyncStorage.getItem("buildingno")
+      if (token !== null && buildingno !== null) {
+        getVehicles(buildingno, token)
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("-", error)
+    }
   }
 
-  const getVehicles = token => {
+  const getVehicles = (buildingno, token) => {
     let config = {
       method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/illegal-parking/?residence_building=3",
+      url: `https://kepah-24275.botics.co/api/v1/illegal-parking/?residence_building=${buildingno}`,
       headers: {
-        Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
+        Authorization: `token ${token}`,
         "Content-Type": "application/json"
       }
     }
@@ -60,22 +60,28 @@ const Confirm = ({ navigation }) => {
           vehicles.reverse()
           setVehicles(vehicles)
           setFiltered(vehicles)
-          console.log(response)
         }
       })
       .catch(error => {})
   }
 
   useEffect(() => {
-    let filter = vehicles.filter(val => {
-      if (search !== "" && val.vehicle_number.includes(search)) {
+    let filter = filtered.filter(val => {
+      if (
+        (search !== "" &&
+          val.vehicle_number &&
+          val.vehicle_number.toLowerCase().includes(search.toLowerCase())) ||
+        (search !== "" &&
+          val.tag &&
+          val.tag.toLowerCase().includes(search.toLowerCase()))
+      ) {
         return val
       }
     })
     if (filter.length < 1 && search === "") {
-      setVehicles(vehicles)
+      setFiltered(vehicles)
     } else {
-      setVehicles(filter)
+      setFiltered(filter)
     }
   }, [search])
 
@@ -116,22 +122,28 @@ const Confirm = ({ navigation }) => {
             <TextInput
               keyboardType="web-search"
               placeholder="Secrch by Name/Tag Number"
-              onChange={e => setSearch(e.target.value)}
+              onChangeText={text => setSearch(text)}
             />
             <Image source={require("../../../assets/security-search.png")} />
           </View>
-          {vehicles.map((val, ind) => {
+          {filtered.map((val, ind) => {
             return (
               <View key={ind}>
                 <View style={styles.vehicle_names_view}>
                   <View>
                     <View style={styles.vehicle_number_view}>
                       <Text style={styles.vehicle_serial_no}>{ind + 1}.</Text>
-                      <Text style={styles.vehicle_number}>{val.vehicle_number}</Text>
+                      <Text style={styles.vehicle_number}>
+                        {val.vehicle_number !== null ? val.vehicle_number : "_"}
+                      </Text>
                     </View>
                   </View>
                   <TouchableOpacity
-                    onPress={() => navigation.navigate("VehicleOwnerProfile")}
+                    onPress={() =>
+                      navigation.navigate("VehicleOwnerProfile", {
+                        vehicle: val
+                      })
+                    }
                   >
                     <Text style={styles.view_more}>View more</Text>
                   </TouchableOpacity>

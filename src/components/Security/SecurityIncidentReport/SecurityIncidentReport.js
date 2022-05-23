@@ -14,37 +14,33 @@ import {
 } from "react-native"
 import { RFValue } from "react-native-responsive-fontsize"
 import Header from "../Header/Header"
-const { height } = Dimensions.get("screen")
 import pathUrl from "../../../config/path"
+const { height } = Dimensions.get("screen")
 
 const SecurityReport = ({ navigation }) => {
   const [incidentId, setIncidentId] = useState(null)
-  const [all, setAll] = useState(true)
-  const [manage, setManage] = useState(false)
-  const [police, setPolice] = useState(false)
   const [previousIncidentList, setPreviousIncidentList] = useState([])
   useEffect(() => {
-    // getToken()
-    getSecurityList()
+    getToken()
   }, [])
 
   const getToken = async () => {
     try {
       const value = await AsyncStorage.getItem("token")
+      let buildingno = await AsyncStorage.getItem("buildingno")
+
       if (value !== null) {
-        getSecurityList(value)
+        getSecurityList(value, buildingno)
       }
-      console.log(value)
     } catch (error) {}
   }
 
-  const getSecurityList = token => {
-    console.log("==---===")
+  const getSecurityList = (token, buildingNo) => {
     var config = {
       method: "get",
-      url: `${pathUrl}/api/v1/security-report?residence_building=3&incident_status=0,1&start_date=2021-05-20&end_date=2021-05-24`,
+      url: `${pathUrl}/api/v1/security-report/?residence_building=${buildingNo}&incident_status=0,1`,
       headers: {
-        Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
+        Authorization: `token ${token}`,
         "Content-Type": "application/json"
       }
     }
@@ -55,7 +51,7 @@ const SecurityReport = ({ navigation }) => {
         setPreviousIncidentList(response.data)
       })
       .catch(error => {
-        console.log(error)
+        console.log("Here is error", error)
       })
   }
 
@@ -76,147 +72,21 @@ const SecurityReport = ({ navigation }) => {
         </View>
 
         <View style={{ backgroundColor: "#e5e5e5" }}>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-around"
-            }}
-          >
-            {all ? (
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#fff",
-                  width: 90,
-                  height: 40,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderTopLeftRadius: 5,
-                  borderTopRightRadius: 5
-                }}
-                onPress={() => {
-                  setManage(false)
-                  setPolice(false)
-                }}
-              >
-                <Text style={{ fontWeight: "bold", color: "#1a73e8" }}>
-                  All
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "rgba(26, 115, 232, 0.4)",
-                  width: 90,
-                  height: 40,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderTopLeftRadius: 5,
-                  borderTopRightRadius: 5
-                }}
-                onPress={() => {
-                  setManage(false)
-                  setAll(true)
-                  setPolice(false)
-                }}
-              >
-                <Text style={{ fontWeight: "bold", color: "#fff" }}>All</Text>
-              </TouchableOpacity>
-            )}
-
-            {manage ? (
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#fff",
-                  width: 90,
-                  height: 40,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderTopLeftRadius: 5,
-                  borderTopRightRadius: 5
-                }}
-                onPress={() => {
-                  setAll(false)
-                  setManage(true)
-                  setPolice(false)
-                }}
-              >
-                <Text style={{ fontWeight: "bold", color: "#1a73e8" }}>
-                  Manage
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "rgba(26, 115, 232, 0.4)",
-                  width: 90,
-                  height: 40,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderTopLeftRadius: 5,
-                  borderTopRightRadius: 5
-                }}
-                onPress={() => {
-                  setAll(false)
-                  setManage(true)
-                  setPolice(false)
-                }}
-              >
-                <Text style={{ fontWeight: "bold", color: "#fff" }}>
-                  Manage
-                </Text>
-              </TouchableOpacity>
-            )}
-
-            {police ? (
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#fff",
-                  width: 90,
-                  height: 40,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderTopLeftRadius: 5,
-                  borderTopRightRadius: 5
-                }}
-                onPress={() => {
-                  setAll(false)
-                  setPolice(false)
-                  setManage(false)
-                }}
-              >
-                <Text style={{ fontWeight: "bold", color: "#1a73e8" }}>
-                  Police
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "rgba(26, 115, 232, 0.4)",
-                  width: 90,
-                  height: 40,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderTopLeftRadius: 5,
-                  borderTopRightRadius: 5
-                }}
-                onPress={() => {
-                  setAll(false)
-                  setPolice(true)
-                  setManage(false)
-                }}
-              >
-                <Text style={{ fontWeight: "bold", color: "#fff" }}>
-                  Police
-                </Text>
-              </TouchableOpacity>
-            )}
+          <View>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#fff",
+                width: 90,
+                height: 40,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                borderTopLeftRadius: 5,
+                borderTopRightRadius: 5
+              }}
+            >
+              <Text style={{ fontWeight: "bold", color: "#1a73e8" }}>All</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.all_security_inputs}>

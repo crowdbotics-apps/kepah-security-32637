@@ -1,9 +1,7 @@
-import axios from "axios"
 import React, { useEffect, useState } from "react"
 import {
   ActivityIndicator,
   AsyncStorage,
-  Dimensions,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -16,16 +14,20 @@ import {
 } from "react-native"
 import { RFValue } from "react-native-responsive-fontsize"
 import { connect } from "react-redux"
-import pathUrl from "../../../config/path"
 
 const Welcome = ({ navigation }) => {
-  const [requestType, setRequestType] = useState("")
+  const [requestType, setRequestType] = useState(null)
   const [pressed, setPressed] = useState(false)
   const [loggingIn] = React.useState(false)
 
-  useEffect(() => {
-    AsyncStorage.clear()
-  }, [])
+  const confirmBuilding = async () => {
+    try {
+      await AsyncStorage.setItem("buildingno", `${requestType}`)
+      navigation.navigate("Dashboard")
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   return (
     <SafeAreaView style={{ backgroundColor: "#fff" }}>
@@ -53,12 +55,14 @@ const Welcome = ({ navigation }) => {
                   <Text style={styles.createPass}>Select Property:</Text>
                   <TouchableOpacity
                     style={styles.inputView}
-                    onPress={() => setPressed(true)}
+                    onPress={() => {
+                      setPressed(!pressed)
+                    }}
                   >
                     <Text>
-                      {requestType !== ""
-                        ? requestType
-                        : setRequestType("Select Property")}
+                      {requestType
+                        ? `Property Name #${requestType}`
+                        : "Select Property"}
                     </Text>
                     <View>
                       <Image
@@ -92,7 +96,7 @@ const Welcome = ({ navigation }) => {
                           <TouchableOpacity
                             onPress={() => {
                               setPressed(false)
-                              setRequestType("Property Name #1")
+                              setRequestType(1)
                             }}
                             style={{ width: "100%" }}
                           >
@@ -108,7 +112,7 @@ const Welcome = ({ navigation }) => {
                           <TouchableOpacity
                             onPress={() => {
                               setPressed(false)
-                              setRequestType("Property Name #2")
+                              setRequestType(3)
                             }}
                             style={{ width: "100%" }}
                           >
@@ -127,7 +131,7 @@ const Welcome = ({ navigation }) => {
                           <TouchableOpacity
                             onPress={() => {
                               setPressed(false)
-                              setRequestType("Property Name #3")
+                              setRequestType(3)
                             }}
                             style={{ width: "100%" }}
                           >
@@ -146,7 +150,7 @@ const Welcome = ({ navigation }) => {
                           <TouchableOpacity
                             onPress={() => {
                               setPressed(false)
-                              setRequestType(" Property Name #4")
+                              setRequestType(4)
                             }}
                             style={{ width: "100%" }}
                           >
@@ -165,7 +169,7 @@ const Welcome = ({ navigation }) => {
                           <TouchableOpacity
                             onPress={() => {
                               setPressed(false)
-                              setRequestType("Property Name #5")
+                              setRequestType(5)
                             }}
                             style={{ width: "100%" }}
                           >
@@ -183,7 +187,8 @@ const Welcome = ({ navigation }) => {
 
             <TouchableOpacity
               style={styles.bottomButton}
-              onPress={() => navigation.navigate("Dashboard")}
+              onPress={confirmBuilding}
+              disabled={requestType ? false : true}
             >
               <View style={styles.btnView}>
                 <Text style={styles.btnText}>CONTINUE</Text>

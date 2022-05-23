@@ -19,47 +19,68 @@ import Header from "../Header/Header"
 const { height } = Dimensions.get("screen")
 
 const Confirm = ({ navigation }) => {
-  const [token, setToken] = useState("")
-  const [vehicles, setVehicles] = useState([1, 2, 3, , 5, 7, 9, 5, 7, 9, 7])
+  const [criminalTrespass, setCriminalTrespass] = useState([1])
   const isFocused = useIsFocused()
 
   useEffect(() => {
     if (isFocused) {
-      // getToken()
-      getVehicles()
+      getToken()
     }
   }, [isFocused])
 
   const getToken = async () => {
     try {
       const value = await AsyncStorage.getItem("token")
+      const buildingno = await AsyncStorage.getItem("buildingno")
       if (value !== null) {
-        setToken(value)
-        getVehicles(value)
+        getCriminalTrespass(value, buildingno)
       }
     } catch (error) {}
   }
 
-  const getVehicles = token => {
-    let config = {
-      method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/criminal-status?residence_building=",
-      headers: {
-        Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
-        "Content-Type": "application/json"
-      }
-    }
-
-    axios(config)
+  const getCriminalTrespass = (token, buildingno) => {
+    axios
+      .get(
+        `https://kepah-24275.botics.co/api/v1/criminal-status/?residence_building=${buildingno}`,
+        {
+          headers: {
+            Authorization: `token ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      )
       .then(response => {
-        let vehicles = response.data
-        if (vehicles && vehicles.length > 0) {
-          vehicles.reverse()
-          setVehicles(vehicles)
+        let criminalTrespass = response.data
+        if (criminalTrespass && criminalTrespass.length > 0) {
+          criminalTrespass.reverse()
+          setCriminalTrespass(criminalTrespass)
         }
       })
-      .catch(error => {})
+      .catch(error => {
+        console.log("-", error)
+      })
   }
+
+  // const getCriminalTrespass = token => {
+  //   let config = {
+  //     method: "get",
+  //     url: "https://kepah-24275.botics.co/api/v1/criminal-status?residence_building=1",
+  //     headers: {
+  //       Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
+  //       "Content-Type": "application/json"
+  //     }
+  //   }
+
+  //   axios(config)
+  //     .then(response => {
+  // let criminalTrespass = response.data
+  // if (criminalTrespass && criminalTrespass.length > 0) {
+  //   criminalTrespass.reverse()
+  //   setCriminalTrespass(criminalTrespass)
+  // }
+  //     })
+  //     .catch(error => {})
+  // }
 
   return (
     <KeyboardAvoidingView
@@ -78,7 +99,7 @@ const Confirm = ({ navigation }) => {
             </Text>
 
             <Text style={styles.my_vehicle}>
-              Criminal Trespass List (36 Active)
+              Criminal Trespass List ({criminalTrespass.length})
             </Text>
           </View>
         </View>
@@ -103,27 +124,28 @@ const Confirm = ({ navigation }) => {
             />
             <Image source={require("../../../assets/security-search.png")} />
           </View>
-          {vehicles.map((val, ind) => {
+          {criminalTrespass.map((val, ind) => {
             return (
               <View style={styles.msg_conversation_1} key={ind}>
                 <View style={styles.conversation_view}>
                   <View style={styles.user_conversation}>
                     <View>
                       <Image
-                        source={require("../../../assets/profile.jpeg")}
+                        source={
+                          val.user_details && val.user_details.profile_picture
+                            ? {
+                                uri: val.user_details.profile_picture
+                              }
+                            : require("../../../assets/profile.jpeg")
+                        }
                         style={styles.user_profile_image}
                       />
                     </View>
                     <View style={{ marginLeft: 20 }}>
-                      <Text style={styles.user_name}>Manager 1</Text>
-                      <Text
-                        style={{
-                          fontSize: RFValue(12),
-                          marginTop: 5,
-                          color: "#848484"
-                        }}
-                      >
-                        Added by: John Doe(Resident)
+                      <Text style={styles.user_name}>
+                        {val.user_details && val.user_details.name !== null
+                          ? val.user_details.name
+                          : "-"}
                       </Text>
                       <Text
                         style={{
@@ -132,8 +154,28 @@ const Confirm = ({ navigation }) => {
                           color: "#848484"
                         }}
                       >
-                        Added: 12/04/21 14:23PM
+                        Added by: {val.marked_by}
                       </Text>
+                      {val.user_details && (
+                        <Text
+                          style={{
+                            fontSize: RFValue(12),
+                            marginTop: 5,
+                            color: "#848484"
+                          }}
+                        >
+                          Added:
+                          {new Date(val.user_details.date_joined).getDate()}/
+                          {new Date(val.user_details.date_joined).getMonth()}/
+                          {new Date(val.user_details.date_joined).getFullYear()}
+                          <Text style={{ marginLeft: 40 }}>
+                            {new Date(val.user_details.date_joined).getHours()}/
+                            {new Date(
+                              val.user_details.date_joined
+                            ).getMinutes()}
+                          </Text>
+                        </Text>
+                      )}
                     </View>
                   </View>
                 </View>
@@ -213,11 +255,11 @@ const styles = StyleSheet.create({
   },
 
   bottomButton: {
-    marginTop: 20,
-    marginBottom: 20,
+    // marginTop: 20,
+    // // marginBottom: 20,
     width: "95%",
     alignSelf: "center",
-    position: "absolute",
+    // position: "absolute",
     bottom: 20
   },
   btnView: {
