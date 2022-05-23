@@ -17,7 +17,7 @@ import Header from '../Header/Header';
 import axios from 'axios';
 const { height} = Dimensions.get('screen');
 
-const Confirm = ({navigation}) => {
+const SuggestCriminalTrespassList = ({navigation}) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNo, setPhoneNo] = useState('');
@@ -264,4 +264,4 @@ const styles = StyleSheet.create({
   submit_view: {marginTop: 10, padding: 20},
 });
 
-export default Confirm;
+export default SuggestCriminalTrespassList;
