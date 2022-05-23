@@ -60,22 +60,28 @@ const Confirm = ({ navigation }) => {
           vehicles.reverse()
           setVehicles(vehicles)
           setFiltered(vehicles)
-          console.log(response)
         }
       })
       .catch(error => {})
   }
 
   useEffect(() => {
-    let filter = vehicles.filter(val => {
-      if (search !== "" && val.vehicle_number.includes(search)) {
+    let filter = filtered.filter(val => {
+      if (
+        (search !== "" &&
+          val.vehicle_number &&
+          val.vehicle_number.toLowerCase().includes(search.toLowerCase())) ||
+        (search !== "" &&
+          val.tag &&
+          val.tag.toLowerCase().includes(search.toLowerCase()))
+      ) {
         return val
       }
     })
     if (filter.length < 1 && search === "") {
-      setVehicles(vehicles)
+      setFiltered(vehicles)
     } else {
-      setVehicles(filter)
+      setFiltered(filter)
     }
   }, [search])
 
@@ -116,11 +122,11 @@ const Confirm = ({ navigation }) => {
             <TextInput
               keyboardType="web-search"
               placeholder="Secrch by Name/Tag Number"
-              onChange={e => setSearch(e.target.value)}
+              onChangeText={text => setSearch(text)}
             />
             <Image source={require("../../../assets/security-search.png")} />
           </View>
-          {vehicles.map((val, ind) => {
+          {filtered.map((val, ind) => {
             return (
               <View key={ind}>
                 <View style={styles.vehicle_names_view}>

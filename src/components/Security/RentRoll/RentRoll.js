@@ -9,43 +9,43 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image
+  Image,
+  AsyncStorage
 } from "react-native"
 import { RFValue } from "react-native-responsive-fontsize"
 import Header from "../Header/Header"
 import { useIsFocused } from "@react-navigation/native"
 import axios from "axios"
-const { height, width } = Dimensions.get("screen")
+const { height } = Dimensions.get("screen")
 
 const Confirm = ({ navigation }) => {
-  const [token, setToken] = useState("")
+  const [search, setSearch] = useState("")
   const [rentRoll, setRentRoll] = useState([])
+  const [filtered, setFiltered] = useState([])
   const isFocused = useIsFocused()
 
   useEffect(() => {
     if (isFocused) {
-      // getToken()
-      getRentRoll()
+      getToken()
     }
   }, [isFocused])
 
   const getToken = async () => {
     try {
       const value = await AsyncStorage.getItem("token")
+      let buildingno = await AsyncStorage.getItem("buildingno")
       if (value !== null) {
-        console.log(value)
-        setToken(value)
-        getRentRoll(value)
+        getRentRoll(value, buildingno)
       }
     } catch (error) {}
   }
 
-  const getRentRoll = token => {
+  const getRentRoll = (token, buildingNo) => {
     let config = {
       method: "get",
-      url: "https://kepah-24275.botics.co/api/v1/resident?residence_building=1",
+      url: `https://kepah-24275.botics.co/api/v1/resident?residence_building=${buildingNo}`,
       headers: {
-        Authorization: "token d1a3b644b435c70d39dbdf20964d9955510eef76",
+        Authorization: `token ${token}`,
         "Content-Type": "application/json"
       }
     }
@@ -56,11 +56,33 @@ const Confirm = ({ navigation }) => {
         if (rentRoll && rentRoll.length > 0) {
           rentRoll.reverse()
           setRentRoll(rentRoll)
-          console.log(rentRoll);
+          setFiltered(rentRoll)
         }
       })
-      .catch(error => {})
+      .catch(() => {})
   }
+
+  useEffect(() => {
+    let filter = rentRoll.filter(val => {
+      if (
+        (search !== "" &&
+          val.apartment_number &&
+          `${val.apartment_number}`
+            .toLowerCase()
+            .includes(search.toLowerCase())) ||
+        (search !== "" &&
+          val.name &&
+          val.name.toLowerCase().includes(search.toLowerCase()))
+      ) {
+        return val
+      }
+    })
+    if (filter.length < 1 && search === "") {
+      setFiltered(rentRoll)
+    } else {
+      setFiltered(filter)
+    }
+  }, [search])
 
   return (
     <KeyboardAvoidingView
@@ -90,7 +112,7 @@ const Confirm = ({ navigation }) => {
             }}
           >
             <TextInput
-              keyboardType="web-search"
+              keyboardType="default"
               placeholder="Full Name"
               style={{
                 borderWidth: 1,
@@ -100,9 +122,10 @@ const Confirm = ({ navigation }) => {
                 borderRadius: 5,
                 fontSize: RFValue(12)
               }}
+              onChangeText={setSearch}
             />
             <TextInput
-              keyboardType="web-search"
+              keyboardType="default"
               placeholder="Apt. Number"
               style={{
                 borderWidth: 1,
@@ -112,6 +135,7 @@ const Confirm = ({ navigation }) => {
                 borderRadius: 5,
                 fontSize: RFValue(12)
               }}
+              onChangeText={setSearch}
             />
             <View
               style={{
@@ -141,19 +165,25 @@ const Confirm = ({ navigation }) => {
 
           <View style={styles.bottom_border} />
 
-          {rentRoll.map((val, ind) => {
+          {filtered.map((val, ind) => {
             return (
-              <View>
+              <View key={ind}>
                 <View style={styles.vehicle_names_view}>
                   <View>
                     <View style={styles.vehicle_number_view}>
-                      <Text style={styles.vehicle_number}>{val.name !== null ? val.name : '-'}</Text>
+                      <Text style={styles.vehicle_number}>
+                        {val.name !== null ? val.name : "-"}
+                      </Text>
                     </View>
                   </View>
                   <TouchableOpacity
                     onPress={() => navigation.navigate("VehicleOwnerProfile")}
                   >
-                    <Text style={styles.view_more}>{val.apt_number !== null ?val.apt_number: "-"}</Text>
+                    <Text style={styles.view_more}>
+                      {val.apartment_number !== null
+                        ? val.apartment_number
+                        : "-"}
+                    </Text>
                   </TouchableOpacity>
                 </View>
 
