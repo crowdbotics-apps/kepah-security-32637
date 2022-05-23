@@ -21,10 +21,6 @@ const { height } = Dimensions.get("screen")
 const ClosedIncidentReports = ({ navigation }) => {
   const [incidentId, setIncidentId] = useState(null)
   const [closeIncidentList, setCloseIncidentList] = useState([])
-  useEffect(() => {
-    getToken()
-    // getCloseIncidentList()
-  }, [])
 
   const getToken = async () => {
     try {
@@ -34,9 +30,7 @@ const ClosedIncidentReports = ({ navigation }) => {
       if (value !== null) {
         getCloseIncidentList(value, buildingno)
       }
-    } catch (error) {
-      console.log("-", error)
-    }
+    } catch (error) {}
   }
 
   const getCloseIncidentList = (token, buildingNo) => {
@@ -51,13 +45,14 @@ const ClosedIncidentReports = ({ navigation }) => {
 
     axios(config)
       .then(response => {
-        console.log(response.data)
         setCloseIncidentList(response.data)
       })
-      .catch(error => {
-        console.log(error)
-      })
+      .catch(() => {})
   }
+
+  useEffect(() => {
+    getToken()
+  }, [])
 
   return (
     <KeyboardAvoidingView
