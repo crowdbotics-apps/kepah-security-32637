@@ -258,7 +258,10 @@ const ResidentPortal = ({ navigation, route }) => {
                 </TouchableOpacity>
               </View>
             </View>
-            <TouchableOpacity style={styles.bottomButton}>
+            <TouchableOpacity
+              style={styles.bottomButton}
+              onPress={() => navigation.navigate("RentRoll")}
+            >
               <View style={styles.btnView}>
                 <Text style={styles.btnText}>Go Back</Text>
               </View>
