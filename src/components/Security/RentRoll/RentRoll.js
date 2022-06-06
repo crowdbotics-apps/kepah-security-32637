@@ -156,9 +156,7 @@ const Confirm = ({ navigation }) => {
                 <Text style={{ fontSize: RFValue(12), left: 5 }}>Name</Text>
               </View>
             </View>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("VehicleOwnerProfile")}
-            >
+            <TouchableOpacity>
               <Text style={{ fontSize: RFValue(12) }}>Apt Number</Text>
             </TouchableOpacity>
           </View>
@@ -169,16 +167,20 @@ const Confirm = ({ navigation }) => {
             return (
               <View key={ind}>
                 <View style={styles.vehicle_names_view}>
-                  <View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate("PersonalInfo", {
+                        rent_roll: val
+                      })
+                    }
+                  >
                     <View style={styles.vehicle_number_view}>
                       <Text style={styles.vehicle_number}>
                         {val.name !== null ? val.name : "-"}
                       </Text>
                     </View>
-                  </View>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("VehicleOwnerProfile")}
-                  >
+                  </TouchableOpacity>
+                  <TouchableOpacity>
                     <Text style={styles.view_more}>
                       {val.apartment_number !== null
                         ? val.apartment_number

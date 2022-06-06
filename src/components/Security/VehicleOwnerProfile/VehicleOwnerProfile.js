@@ -15,6 +15,7 @@ const { width, height } = Dimensions.get("screen")
 
 const ResidentPortal = ({ navigation, route }) => {
   const [vehicleInformation] = useState(route.params.vehicle)
+  console.log("vehicleInformation",vehicleInformation)
   return (
     <View>
       <View style={{ backgroundColor: "#e5e5e5" }}>

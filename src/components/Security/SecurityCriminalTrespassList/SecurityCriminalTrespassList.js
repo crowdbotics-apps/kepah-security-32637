@@ -171,7 +171,7 @@ const Confirm = ({ navigation }) => {
                         >
                           Added:
                           {new Date(val.user_details.date_joined).getDate()}/
-                          {new Date(val.user_details.date_joined).getMonth()}/
+                          {new Date(val.user_details.date_joined).getMonth()+1}/
                           {new Date(val.user_details.date_joined).getFullYear()}
                           <Text style={{ marginLeft: 40 }}>
                             -{new Date(val.user_details.date_joined).getHours()}
