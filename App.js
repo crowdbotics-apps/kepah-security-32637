@@ -19,7 +19,9 @@ import ClosedIncidentReports from "././src/components/Security/ClosedIncidentRep
 import SecurityCriminalTrespassList from "././src/components/Security/SecurityCriminalTrespassList/SecurityCriminalTrespassList"
 import SuggestNewCriminalTrespass from "././src/components/Security/SecurityCriminalTrespassList/SuggestNewCriminalTrespass"
 import RentRoll from "././src/components/Security/RentRoll/RentRoll"
-import StartNewMsg from "././src/components/Security/StartNewMsg/StartNewMsg"
+import StartNewMsg from "./src/components/Security/MsgSecurity/StartNewMsg"
+import Conversation from "./src/components/Security/MsgSecurity/Conversation"
+import ConversationUsers from "./src/components/Security/MsgSecurity/ConversationUsers"
 import SecurityConversation from "././src/components/Security/SecuritySendMsg/SecurityConversation"
 import SexOffenders from "././src/components/Security/SexOffenders/SexOffenders"
 import PersonalInfo from "././src/components/Security/RentRoll/PersonalInfo"
@@ -83,7 +85,10 @@ const App = () => {
           />
           <Stack.Screen name="RentRoll" component={RentRoll} />
           <Stack.Screen name="PersonalInfo" component={PersonalInfo} />
+          <Stack.Screen name="Conversation" component={Conversation} />
+          <Stack.Screen name="ConversationUsers" component={ConversationUsers} />
           <Stack.Screen name="StartNewMsg" component={StartNewMsg} />
+
           <Stack.Screen
             name="SecurityConversation"
             component={SecurityConversation}

@@ -200,7 +200,7 @@ const Confirm = ({ navigation }) => {
         onPress={() => navigation.navigate("Dashboard")}
       >
         <View style={styles.btnView}>
-          <Text style={styles.btnText}>SUBMIT </Text>
+          <Text style={styles.btnText}>Go Back </Text>
         </View>
       </TouchableOpacity>
     </KeyboardAvoidingView>

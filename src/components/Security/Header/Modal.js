@@ -57,7 +57,7 @@ const ModalContent = ({isMenuVisible, setMenuVisible, navigation}) => {
           onPress={() => {
             toggleModal();
 
-            navigation.navigate('SecurityConversation');
+            navigation.navigate('ConversationUsers');
           }}
           style={styles.msg_manager_touchable}>
           <View style={styles.image_view}>
