@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Dimensions,
   Image,
@@ -6,16 +6,82 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Linking,
+  Alert,
+  AsyncStorage,
+  TextInput
 } from "react-native"
 import { RFValue } from "react-native-responsive-fontsize"
 import Header from "../Header/Header"
+import axios from "axios"
 
 const { width, height } = Dimensions.get("screen")
 
 const ResidentPortal = ({ navigation, route }) => {
   const [vehicleInformation] = useState(route.params.vehicle)
-  console.log("vehicleInformation",vehicleInformation)
+  const [inform, setInform] = useState(false)
+  const [details, setDetails] = useState("")
+  const [token, setToken] = useState("")
+  const [buildingNo, setBuildingNo] = useState("")
+
+  const getToken = async () => {
+    try {
+      const value = await AsyncStorage.getItem("token")
+      let buildingno = await AsyncStorage.getItem("buildingno")
+      if (value !== null && buildingno !== null) {
+        setToken(value)
+        setBuildingNo(buildingno)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    getToken()
+  }, [])
+
+  const openContact = () => {
+    if (vehicleInformation.reporter_details.phone_number) {
+      Linking.openURL(`tel:${vehicleInformation.reporter_details.phone_number}`)
+    } else {
+      Alert.alert("Phone number not found.")
+    }
+  }
+
+  const createViolation = () => {
+    var data = JSON.stringify({
+      violation_type: 1,
+      violation_sub_type: 1,
+      details: details,
+      assignee: vehicleInformation.reporter_details.id,
+      residence_building: buildingNo,
+      due_date: new Date()
+    })
+
+    var config = {
+      method: "post",
+      url: "https://kepah-24275.botics.co/api/v1/violation/",
+      headers: {
+        Authorization: `token ${token}`,
+        "Content-Type": "application/json"
+      },
+      data: data
+    }
+
+    axios(config)
+      .then(function (response) {
+        Alert.alert(`Sent to informer successfully`)
+        setInform(false)
+      })
+      .catch(function (error) {
+        Alert.alert(`Sending unsuccessfull, Try again`)
+        console.log(error)
+        setInform(false)
+      })
+  }
+
   return (
     <View>
       <View style={{ backgroundColor: "#e5e5e5" }}>
@@ -61,27 +127,83 @@ const ResidentPortal = ({ navigation, route }) => {
                   <Text style={{ fontSize: RFValue(13) }}>
                     {vehicleInformation.reporter_details.user_type}
                   </Text>
-                  <Text
-                    style={{
-                      fontSize: RFValue(12),
-                      color: "#1a73e8",
-                      textDecorationLine: "underline"
-                    }}
-                  >
-                    Contact
-                  </Text>
+                  <TouchableOpacity onPress={() => openContact()}>
+                    <Text
+                      style={{
+                        fontSize: RFValue(12),
+                        color: "#1a73e8",
+                        textDecorationLine: "underline"
+                      }}
+                    >
+                      Contact
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </View>
 
               <View>
-                <TouchableOpacity
-                  style={styles.informBtn}
-                  onPress={() => navigation.navigate("Dashboard")}
-                >
-                  <View style={styles.btnView2}>
-                    <Text style={styles.btnText2}>INFORM USER OF ACTION </Text>
+                {!inform ? (
+                  <TouchableOpacity
+                    style={styles.informBtn}
+                    onPress={() => {
+                      setInform(true)
+                      // Alert.alert("Message sent to reporter ")
+                      // navigation.navigate("Dashboard")
+                    }}
+                  >
+                    <View style={styles.btnView2}>
+                      <Text style={styles.btnText2}>INFORM USER OF ACTION</Text>
+                    </View>
+                  </TouchableOpacity>
+                ) : (
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center"
+                    }}
+                  >
+                    <TextInput
+                      //   keyboardType="text"
+                      placeholder="Enter details"
+                      onChangeText={text => setDetails(text)}
+                      multiline={true}
+                      style={{
+                        backgroundColor: "#e5e5e5",
+                        height: 50,
+                        width: "90%",
+                        borderRadius: 5,
+                        padding: 10
+                      }}
+                    />
+
+                    <View
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        marginTop: 10
+                      }}
+                    >
+                      <TouchableOpacity
+                        style={[styles.informBtn, { width: "50%" }]}
+                        onPress={() => setInform(false)}
+                      >
+                        <View style={styles.btnView2}>
+                          <Text style={styles.btnText2}>CANCEL</Text>
+                        </View>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[styles.informBtn, { width: "50%" }]}
+                        onPress={createViolation}
+                      >
+                        <View style={styles.btnView}>
+                          <Text style={styles.btnText}>SUBMIT</Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </TouchableOpacity>
+                )}
 
                 <TouchableOpacity
                   style={styles.bottomButton}

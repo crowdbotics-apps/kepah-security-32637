@@ -38,8 +38,7 @@ const ResidentPortal = ({ navigation, route }) => {
     }
 
     axios(config)
-      .then(response => {
-        console.log(response)
+      .then(() => {
         navigation.navigate("ListOfVehicles")
       })
       .catch(error => {

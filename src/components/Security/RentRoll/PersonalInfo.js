@@ -81,7 +81,6 @@ const ResidentPortal = ({ navigation, route }) => {
 
     axios(config)
       .then(function (response) {
-        console.log(JSON.stringify(response.data))
         Alert.alert(`${selectedViolation.name} sent`)
         selectViolation(null)
       })
