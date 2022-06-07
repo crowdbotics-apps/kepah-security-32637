@@ -22,6 +22,7 @@ import RentRoll from "././src/components/Security/RentRoll/RentRoll"
 import StartNewMsg from "././src/components/Security/StartNewMsg/StartNewMsg"
 import SecurityConversation from "././src/components/Security/SecuritySendMsg/SecurityConversation"
 import SexOffenders from "././src/components/Security/SexOffenders/SexOffenders"
+import PersonalInfo from "././src/components/Security/RentRoll/PersonalInfo"
 
 import { store } from "./src/store/index"
 
@@ -81,6 +82,7 @@ const App = () => {
             component={SuggestNewCriminalTrespass}
           />
           <Stack.Screen name="RentRoll" component={RentRoll} />
+          <Stack.Screen name="PersonalInfo" component={PersonalInfo} />
           <Stack.Screen name="StartNewMsg" component={StartNewMsg} />
           <Stack.Screen
             name="SecurityConversation"
