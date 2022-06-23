@@ -14,11 +14,14 @@ import {
 } from "react-native"
 import { RFValue } from "react-native-responsive-fontsize"
 import { connect } from "react-redux"
+import axios from "axios"
 
 const Welcome = ({ navigation }) => {
   const [requestType, setRequestType] = useState(null)
   const [pressed, setPressed] = useState(false)
   const [loggingIn] = React.useState(false)
+  const [email, setEmail] = useState("")
+  const [name, setName] = useState("")
 
   const confirmBuilding = async () => {
     try {
@@ -26,6 +29,42 @@ const Welcome = ({ navigation }) => {
       navigation.navigate("Dashboard")
     } catch (e) {}
   }
+
+  const getUserDetails = token => {
+    var config = {
+      method: "get",
+      url: "https://kepah-24275.botics.co/rest-auth/user/",
+      headers: {
+        Authorization: `token ${token}`,
+        "Content-Type": "application/json"
+      }
+    }
+
+    axios(config)
+      .then(response => {
+        setEmail(response.data.email)
+        setName(response.data.name)
+      })
+      .catch(error => {
+        console.log("error", error)
+      })
+  }
+
+  const getToken = async () => {
+    try {
+      const value = await AsyncStorage.getItem("token")
+      if (value !== null) {
+        console.log("value", value)
+        getUserDetails(value)
+      }
+    } catch (error) {
+      console.log(error)
+      // Error retrieving data
+    }
+  }
+  useEffect(() => {
+    getToken()
+  }, [])
 
   return (
     <SafeAreaView style={{ backgroundColor: "#fff" }}>
@@ -41,9 +80,9 @@ const Welcome = ({ navigation }) => {
               </View>
 
               <View style={styles.welcomeView}>
-                <Text style={styles.welcome}>Welcome John</Text>
-                <Text style={styles.name}>John Doe </Text>
-                <Text style={styles.email}>john@website.com</Text>
+                <Text style={styles.welcome}>Welcome</Text>
+                <Text style={styles.name}>{name} </Text>
+                <Text style={styles.email}>{email}</Text>
               </View>
             </View>
 
